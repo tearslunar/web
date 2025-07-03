@@ -1,26 +1,41 @@
-from pdfminer.high_level import extract_text_to_fp
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
 from io import StringIO
+from pathlib import Path
 
-def extract_text_with_pdfminer(pdf_path, output_txt_path=None):
-    laparams = LAParams()  # 레이아웃 분석 파라미터 (기본값 사용 가능)
-    output_string = StringIO()
+def extract_text_by_page(pdf_path):
+    laparams = LAParams()
+    resource_manager = PDFResourceManager()
+    full_text = ""
 
     with open(pdf_path, 'rb') as f:
-        extract_text_to_fp(f, output_string, laparams=laparams, output_type='text', codec=None)
+        for i, page in enumerate(PDFPage.get_pages(f)):
+            output_string = StringIO()
+            device = TextConverter(resource_manager, output_string, laparams=laparams)
+            interpreter = PDFPageInterpreter(resource_manager, device)
 
-    full_text = output_string.getvalue()
+            interpreter.process_page(page)
+            page_text = output_string.getvalue()
+            output_string.close()
+            device.close()
 
-    if output_txt_path:
-        with open(output_txt_path, 'w', encoding='utf-8') as out_file:
-            out_file.write(full_text)
-        print(f"[완료] '{output_txt_path}'에 텍스트 저장 완료.")
+            full_text += f"\n\n--- Page {i+1} ---\n{page_text.strip()}"
 
     return full_text
 
+def save_text_with_same_name_as_pdf(pdf_path, text):
+    pdf_file = Path(pdf_path)
+    txt_filename = pdf_file.stem + ".txt"
+    output_path = pdf_file.with_name(txt_filename)
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(text)
+    print(f"[완료] '{output_path}'에 텍스트 저장 완료.")
 
 if __name__ == "__main__":
-    pdf_path = "/Users/differz/Desktop/web/약관.pdf"  # 실제 경로로 변경
-    output_path = "/Users/differz/Desktop/web/result/약관.txt"  # 결과 저장 경로
-    text = extract_text_with_pdfminer(pdf_path, output_path)
-    print("[INFO] PDFMiner로 텍스트 추출 완료.")
+    pdf_path = "/Users/differz/Desktop/web/result/약관.pdf"  # 예시 경로
+    extracted_text = extract_text_by_page(pdf_path)
+    save_text_with_same_name_as_pdf(pdf_path, extracted_text)
+    print("[INFO] PDFMiner로 페이지별 텍스트 추출 및 저장 완료.")
