@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>현대해상 다이렉트</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+
+    body {
+      background: #f0f0f0;
+      position: relative;
+    }
+
+    .background-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .icon-wrapper {
+      position: fixed;
+      bottom: 65px;
+      right: 114px;
+      z-index: 999;
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #e87c1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .speech-bubble {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: white;
+      padding: 14px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      white-space: nowrap;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .speech-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid white;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .icon.pulse {
+      animation: pulse 0.6s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <!-- 배경 이미지 -->
+  <div class="background-image">
+    <img src="/Users/differz/Desktop/web/메인화면.png" alt="배경 이미지" />
+  </div>
+
+  <!-- 우측 하단 말하는 아이콘 -->
+  <div class="icon-wrapper">
+    <div class="speech-bubble" id="speech">안녕하세요!</div>
+    <div class="icon" id="clickable-icon">
+      <img src="index.png" alt="아이콘 이미지" />
+    </div>
+  </div>
+
+  <script>
+    const bubble = document.getElementById('speech');
+    const icon = document.querySelector('.icon');
+    const messages = [
+      "무엇을 도와드릴까요?",
+      "상담사가 기다리고 있어요!",
+      "어서 눌러주세요!",
+      "빠른 상담이 가능해요!",
+      "클릭해보세요!",
+    ];
+
+    function showMessage() {
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      bubble.textContent = message;
+      bubble.classList.add('show');
+
+      icon.classList.add('pulse');
+
+      setTimeout(() => {
+        bubble.classList.remove('show');
+        icon.classList.remove('pulse');
+      }, 2500);
+    }
+
+    setInterval(showMessage, 5000);
+
+    // 클릭하면 다른 페이지로 이동
+    icon.addEventListener('click', () => {
+      window.location.href = 'http://3.39.189.80/';
+    });
+  </script>
+</body>
+</html>
